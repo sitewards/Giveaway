@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * The main config file of the Sitewards Giveaway extension
+ *
+ * @category    Sitewards
+ * @package     Sitewards_Giveaway
+ * @copyright   Copyright (c) 2012 Sitewards GmbH (http://www.sitewards.com/de/)
+ */
+-->
+<config>
+	<modules>
+		<Sitewards_Giveaway>
+			<version>1.0.0</version>
+		</Sitewards_Giveaway>
+	</modules>
+	<!-- Set the default values for this extension -->
+	<default>
+		<sitewards_giveaway_config>
+			<sitewards_giveaway_general>
+				<enable_ext>1</enable_ext>
+				<giveaway_identifier_name>is_giveaway</giveaway_identifier_name>
+				<giveaways_per_cart>1</giveaways_per_cart>
+				<giveaways_forward_to_list>1</giveaways_forward_to_list>
+			</sitewards_giveaway_general>
+		</sitewards_giveaway_config>
+	</default>
+	<global>
+		<helpers>
+			<sitewards_giveaway>
+				<class>Sitewards_Giveaway_Helper</class>
+			</sitewards_giveaway>
+		</helpers>
+		<models>
+			<sitewards_giveaway>
+				<class>Sitewards_Giveaway_Model</class>
+			</sitewards_giveaway>
+		</models>
+		<blocks>
+			<sitewards_giveaway>
+				<class>Sitewards_Giveaway_Block</class>
+			</sitewards_giveaway>
+			<checkout>
+				<rewrite>
+					<onepage_link>Sitewards_Giveaway_Block_Checkout_Onepage_Link</onepage_link>
+					<multishipping_link>Sitewards_Giveaway_Block_Checkout_Multishipping_Link</multishipping_link>
+					<links>Sitewards_Giveaway_Block_Checkout_Links</links>
+					<cart_sidebar>Sitewards_Giveaway_Block_Checkout_Cart_Sidebar</cart_sidebar>
+				</rewrite>
+			</checkout>
+		</blocks>
+		<resources>
+			<sitewards_giveaway_setup>
+				<setup>
+					<module>Sitewards_Giveaway</module>
+					<class>Sitewards_Giveaway_Model_Resource_Eav_Mysql4_Setup</class>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</sitewards_giveaway_setup>
+		</resources>
+	</global>
+	<frontend>
+
+		<events>
+			<checkout_cart_add_product_complete>
+				<observers>
+					<myEventForCheckoutCartAddProductComplete>
+						<type>singleton</type>
+						<class>sitewards_giveaway/observer</class>
+						<method>onCheckoutCartAddProductComplete</method>
+					</myEventForCheckoutCartAddProductComplete>
+				</observers>
+			</checkout_cart_add_product_complete>
+		</events>
+
+		<layout>
+			<updates>
+				<sitewards_giveaway>
+					<file>sitewards/giveaway.xml</file>
+				</sitewards_giveaway>
+			</updates>
+		</layout>
+		<routers>
+			<sitewards_giveaway>
+				<use>standard</use>
+				<args>
+					<module>Sitewards_Giveaway</module>
+					<frontName>giveaway</frontName>
+				</args>
+			</sitewards_giveaway>
+			<checkout>
+				<args>
+					<modules>
+						<Sitewards_Giveaway before="Mage_Checkout">Sitewards_Giveaway</Sitewards_Giveaway>
+					</modules>
+				</args>
+			</checkout>
+		</routers>
+		<translate>
+			<modules>
+				<sitewards_giveaway>
+					<files>
+						<default>Sitewards_Giveaway.csv</default>
+					</files>
+				</sitewards_giveaway>
+			</modules>
+		</translate>
+	</frontend>
+</config>

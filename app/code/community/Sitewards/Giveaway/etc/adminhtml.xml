@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * The adminhtml config file of the Sitewards Giveaway extension
+ *
+ * @category    Sitewards
+ * @package     Sitewards_Giveaway
+ * @copyright   Copyright (c) 2012 Sitewards GmbH (http://www.sitewards.com/de/)
+ */
+-->
+<config>
+	<acl>
+		<resources>
+			<admin>
+				<children>
+					<system>
+						<children>
+							<config>
+								<children>
+									<sitewards_giveaway_config>
+										<title>Sitewards Giveaway - Configuration</title>
+										<sort_order>1000</sort_order>
+									</sitewards_giveaway_config>
+								</children>
+							</config>
+						</children>
+					</system>
+				</children>
+			</admin>
+		</resources>
+	</acl>
+</config>
