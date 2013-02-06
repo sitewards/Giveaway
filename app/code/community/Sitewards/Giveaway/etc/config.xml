@@ -62,7 +62,6 @@
 		</resources>
 	</global>
 	<frontend>
-
 		<events>
 			<checkout_cart_add_product_complete>
 				<observers>
@@ -74,7 +73,6 @@
 				</observers>
 			</checkout_cart_add_product_complete>
 		</events>
-
 		<layout>
 			<updates>
 				<sitewards_giveaway>
@@ -108,4 +106,15 @@
 			</modules>
 		</translate>
 	</frontend>
+	<adminhtml>
+		<translate>
+			<modules>
+				<sitewards_giveaway>
+					<files>
+						<default>Sitewards_Giveaway.csv</default>
+					</files>
+				</sitewards_giveaway>
+			</modules>
+		</translate>
+	</adminhtml>
 </config>
