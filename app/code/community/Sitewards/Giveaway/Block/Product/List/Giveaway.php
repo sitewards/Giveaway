@@ -53,7 +53,7 @@ class Sitewards_Giveaway_Block_Product_List_Giveaway extends Mage_Catalog_Block_
 		}
 
 		// add page title
-		$oTitleBlock = $this->getLayout()->createBlock('sitewards_giveaway/product_listtitle')
+		$oTitleBlock = $this->getLayout()->createBlock('sitewards_giveaway/product_listTitle')
 			->setTemplate('sitewards/giveaway/catalog/product/list_title.phtml')
 			->setPageTitle($sTitle);
 		$this->getLayout()->getBlock('content')->insert($oTitleBlock);
