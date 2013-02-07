@@ -5,13 +5,13 @@
  *
  * @category    Sitewards
  * @package     Sitewards_Giveaway
- * @copyright   Copyright (c) 2012 Sitewards GmbH (http://www.sitewards.com/de/)
+ * @copyright   Copyright (c) 2012 Sitewards GmbH (http://www.sitewards.com/)
  */
 -->
 <config>
 	<modules>
 		<Sitewards_Giveaway>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</Sitewards_Giveaway>
 	</modules>
 	<!-- Set the default values for this extension -->
