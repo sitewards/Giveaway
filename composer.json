@@ -1,0 +1,10 @@
+{
+    "name": "sitewards/giveaway",
+    "license": "OSL-3.0",
+    "type": "magento-module",
+    "description": "This extension provides functionality for handling giveaway products in the shop",
+    "homepage": "http://www.sitewards.com",
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
