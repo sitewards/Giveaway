@@ -53,8 +53,7 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 			}
 		}
 
-		if ($this->_canAddGiveaway($aProductInformation) == false) {
-			$this->_getSession()->addNotice($this->__('Cannot add the item to shopping cart. You have already reached your limit of giveaway products.'));
+		if (Mage::helper('sitewards_giveaway')->canAddGiveawaysToCart() == false) {
 			$this->_goBack();
 		} else {
 			parent::updatePostAction();
