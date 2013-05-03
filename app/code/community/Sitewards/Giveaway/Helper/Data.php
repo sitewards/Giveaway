@@ -33,6 +33,17 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	/**
+	 * Returns the number of product in cart needed to add giveaways
+	 *
+	 * @return integer
+	 */
+	protected function getNonGiveawaysPerCart() {
+		if ( $this->isExtensionEnabled() == true ) {
+			return Mage::getStoreConfig('sitewards_giveaway_config/sitewards_giveaway_general/min_products');
+		}
+	}
+
+	/**
 	 * Returns true is extension is active
 	 * 
 	 * @return boolean
@@ -74,23 +85,16 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 * @return array
 	 */
 	public function getCartGiveawayProductsAmounts(){
-		$oCart = Mage::getSingleton('checkout/cart');
-		$oProduct = Mage::getModel('catalog/product');
-		$oItems = $oCart->getItems();
+		return $this->getCartProductsAmounts(true);
+	}
 
-		$aGiveawayProductsInCart = array();
-		foreach($oItems as $oItem) {
-			$oCollection = $oProduct->getResourceCollection()
-				->addAttributeToFilter('entity_id', $oItem->getData('product_id'))
-				->addAttributeToFilter($this->getGiveawayIdentifierName(), true);
-			$aProductId = $oCollection->getAllIds();
-			// if the $aProductId is not empty, then we have a giveaway product
-			if (!empty($aProductId)){
-				$aGiveawayProductsInCart[$oItem->getData('product_id')] = $oItem->getData('qty');
-			}
-		}
-
-		return $aGiveawayProductsInCart;
+	/**
+	 * Returns an array of non giveaway product ids and their amount in the cart
+	 *
+	 * @return array
+	 */
+	public function getCartNonGiveawayProductsAmounts(){
+		return $this->getCartProductsAmounts(false);
 	}
 
 	/**
@@ -99,8 +103,36 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 * @return boolean|integer
 	 */
 	public function canAddGiveawaysToCart(){
+		return ($this->canHaveMoreGiveaways() AND $this->hasEnoughNonGiveaways());
+	}
+
+	/**
+	 * returns if user has enough non giveaways in cart
+	 */
+	private function hasEnoughNonGiveaways() {
+		$aNonGiveawayProductsInCart = $this->getCartNonGiveawayProductsAmounts();
+		if (array_sum($aNonGiveawayProductsInCart) < $this->getNonGiveawaysPerCart()) {
+			return true;
+		} else {
+			Mage::getSingleton('checkout/session')->addNotice($this->__('Cannot add the item to shopping cart. You need more products in cart.'));
+			return false;
+		}
+
+	}
+
+	/**
+	 * returns if user has not already all possible giveaways in cart
+	 *
+	 * @return bool
+	 */
+	private function canHaveMoreGiveaways() {
 		$aGiveawayProductsInCart = $this->getCartGiveawayProductsAmounts();
-		return array_sum($aGiveawayProductsInCart) < $this->getGiveawaysPerCart();
+		if (array_sum($aGiveawayProductsInCart) < $this->getGiveawaysPerCart()) {
+			return true;
+		} else {
+			Mage::getSingleton('checkout/session')->addNotice($this->__('Cannot add the item to shopping cart. You have already reached your limit of giveaway products.'));
+			return false;
+		}
 	}
 
 	/**
@@ -157,4 +189,29 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		return $bValidCart;
 	}
 
+	/**
+	 * Returns an array of non giveaway product ids and their amount in the cart
+	 *
+	 * @return array
+	 */
+	private function getCartProductsAmounts($bIsGiveaway = false) {
+		$oCart = Mage::getSingleton('checkout/cart');
+		$oProduct = Mage::getModel('catalog/product');
+		$oItems = $oCart->getItems();
+
+		$aProductsInCart = array();
+		foreach ($oItems as $oItem) {
+			$oCollection = $oProduct
+				->getResourceCollection()
+				->addAttributeToFilter('entity_id', $oItem->getData('product_id'))
+				->addAttributeToFilter($this->getGiveawayIdentifierName(), $bIsGiveaway);
+			$aProductId = $oCollection->getAllIds();
+			// if the $aProductId is not empty, then we have a giveaway product
+			if (!empty($aProductId)) {
+				$aProductsInCart[$oItem->getData('product_id')] = $oItem->getData('qty');
+			}
+		}
+
+		return $aProductsInCart;
+	}
 }

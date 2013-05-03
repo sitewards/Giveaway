@@ -54,7 +54,7 @@
 							<source_model>sitewards_giveaway/system_config_product_identifier</source_model>
 						</giveaway_identifier_name>
 						<giveaways_per_cart translate="label comment">
-							<label>Product Count</label>
+							<label>Giveaway Count</label>
 							<comment>Number of giveaway products allowed per cart</comment>
 							<frontend_type>text</frontend_type>
 							<sort_order>3</sort_order>
@@ -72,6 +72,15 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</giveaways_forward_to_list>
+						<min_products translate="label comment">
+							<label>Product Count</label>
+							<comment>Number of products required in cart to add giveaways</comment>
+							<frontend_type>text</frontend_type>
+							<sort_order>5</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</min_products>
 					</fields>
 				</sitewards_giveaway_general>
 			</groups>

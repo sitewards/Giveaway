@@ -22,6 +22,7 @@
 				<giveaway_identifier_name>is_giveaway</giveaway_identifier_name>
 				<giveaways_per_cart>1</giveaways_per_cart>
 				<giveaways_forward_to_list>1</giveaways_forward_to_list>
+				<min_products>1</min_products>
 			</sitewards_giveaway_general>
 		</sitewards_giveaway_config>
 	</default>
