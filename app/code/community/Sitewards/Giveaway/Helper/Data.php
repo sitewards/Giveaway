@@ -33,6 +33,17 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	/**
+	 * Returns min total to add giveaways
+	 *
+	 * @return integer
+	 */
+	protected function getMinTotal() {
+		if ( $this->isExtensionEnabled() == true ) {
+			return Mage::getStoreConfig('sitewards_giveaway_config/sitewards_giveaway_general/min_total');
+		}
+	}
+
+	/**
 	 * Returns the number of product in cart needed to add giveaways
 	 *
 	 * @return integer
@@ -103,7 +114,21 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 * @return boolean|integer
 	 */
 	public function canAddGiveawaysToCart(){
-		return ($this->canHaveMoreGiveaways() AND $this->hasEnoughNonGiveaways());
+		return ($this->canHaveMoreGiveaways() AND $this->hasEnoughNonGiveaways() AND $this->hasEnoughTotal());
+	}
+
+	/**
+	 * returns true is sessions grand total is at least the defined min_total
+	 *
+	 * @return bool
+	 */
+	private function hasEnoughTotal() {
+		$oCheckoutSession = Mage::getSingleton('checkout/session');
+		if ($oCheckoutSession->getQuote()->getBaseGrandTotal() < $this->getMinTotal()) {
+			$oCheckoutSession->addNotice($this->__('Cannot add the item to shopping cart. You need more total.'));
+			return false;
+		}
+		return true;
 	}
 
 	/**

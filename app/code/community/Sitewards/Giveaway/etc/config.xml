@@ -23,6 +23,7 @@
 				<giveaways_per_cart>1</giveaways_per_cart>
 				<giveaways_forward_to_list>1</giveaways_forward_to_list>
 				<min_products>1</min_products>
+				<min_total>0</min_total>
 			</sitewards_giveaway_general>
 		</sitewards_giveaway_config>
 	</default>
