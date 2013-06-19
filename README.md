@@ -9,7 +9,9 @@ Customization
 You can adjust following behaviour:
 * Define products as giveaways
 * Change allowed amount of giveaway products per cart
-* Decide if the customer should be forwarded to giveaway overview page after adding a product to the cart 
+* Change min non giveaway products per cart
+* Change the minimum grand total
+* Decide if the customer should be forwarded to giveaway overview page after adding a product to the cart
 
 Installation instruction
 ------------------------

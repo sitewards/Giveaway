@@ -19,16 +19,13 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 	 * @return void
 	 */
 	public function addAction() {
-
 		/** @var Sitewards_Giveaway_Helper_Data $oHelper */
 		$oHelper = Mage::helper('sitewards_giveaway');
 
-		$aParams = $this->getRequest()->getParams();
+		$aProductInformation = $oHelper->getAddCartProductInfo($this->getRequest());
 
-		if (
-			$oHelper->isProductGiveaway(Mage::getModel('catalog/product')->load($aParams['product']))
-			AND
-			$oHelper->canAddGiveawaysToCart() == false
+		if ($oHelper->isProductGiveaway($aProductInformation[0]['id'])
+			&& $oHelper->canAddProducts($aProductInformation, Sitewards_Giveaway_Helper_Data::S_CART_ACTION_ADD) == false
 		) {
 			$this->_goBack();
 		} else {
@@ -37,44 +34,15 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 	}
 
 	/**
-	 * Returns an array of all giveaways in the cart after updating the quantities
-	 *
-	 * @return array keys - product-ids, values - new amount in the cart
-	 */
-	protected function getGiveawaysInCart(){
-		$aParams = $this->getRequest()->getParams();
-
-		/** @var Sitewards_Giveaway_Helper_Data $oHelper */
-		$oHelper = Mage::helper('sitewards_giveaway');
-
-		$oCartItems = $this->_getCart()->getItems();
-
-		$aGiveawaysInCart = $oHelper->getCartGiveawayProductsAmounts();
-
-		foreach ($oCartItems as $iItemIndex => $oItem) {
-			/** @var Mage_Sales_Model_Quote_Item $oItem */
-			if (isset($aParams['cart'][$iItemIndex])) {
-				if ($oHelper->isProductGiveaway(Mage::getModel('catalog/product')->load($oItem->getProductId()))){
-					$aGiveawaysInCart[$oItem->getProductId()] = $aParams['cart'][$iItemIndex]['qty'];
-				}
-			}
-		}
-
-		return $aGiveawaysInCart;
-	}
-
-	/**
 	 * Updates info in the cart. Adds a notice if trying to increase
 	 * the amount of giveaway product over the allowed limit
 	 */
 	public function updatePostAction() {
+		$aParams = $this->getRequest()->getParams();
 		/** @var Sitewards_Giveaway_Helper_Data $oHelper */
 		$oHelper = Mage::helper('sitewards_giveaway');
-
-		$aGiveawaysInCart = $this->getGiveawaysInCart();
-
-		if (array_sum($aGiveawaysInCart) > $oHelper->getGiveawaysPerCart()){
-			$oHelper->setMaximumGiveawayAmountReachedMessage();
+		$aProductInformation = $oHelper->getUpdateCartProductInfo($this->getRequest());
+		if ($aParams['update_cart_action'] == 'update_qty' && $oHelper->canAddProducts($aProductInformation) == false) {
 			$this->_goBack();
 		} else {
 			parent::updatePostAction();

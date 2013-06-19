@@ -18,17 +18,14 @@ class Sitewards_Giveaway_Model_Observer extends Mage_Core_Model_Observer {
 	 * @param Varien_Event_Observer $oObserver
 	 */
 	public function onCheckoutCartAddProductComplete(Varien_Event_Observer $oObserver){
-
-		$iProductId = $oObserver->getEvent()->getProduct()->getId();
-		$oProduct = Mage::getModel('catalog/product')->load($iProductId);
-
 		/** @var $oHelper Sitewards_Giveaway_Helper_Data */
 		$oHelper = Mage::helper('sitewards_giveaway');
 
 		if ($oHelper->isExtensionEnabled()
-		  && $oHelper->isForwardToGiveawaysPageEnabled()
-		  && $oHelper->canAddGiveawaysToCart() !== false
-		  && !$oHelper->isProductGiveaway($oProduct)){
+			&& $oHelper->isForwardToGiveawaysPageEnabled()
+			&& $oHelper->canAddGiveawaysToCart() !== false
+			&& !$oHelper->isProductGiveaway($oObserver->getEvent()->getProduct()->getId())
+		) {
 			$oObserver->getRequest()->setParam('return_url', Mage::getUrl($oHelper->getGiveawaysPage()));
 		}
 	}
