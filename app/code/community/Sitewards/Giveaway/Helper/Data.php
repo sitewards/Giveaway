@@ -114,7 +114,15 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 * @return boolean|integer
 	 */
 	public function canAddGiveawaysToCart(){
-		return ($this->canHaveMoreGiveaways() AND $this->hasEnoughNonGiveaways() AND $this->hasEnoughTotal());
+		return (
+			$this->canHaveMoreGiveaways()
+			AND
+			$this->hasEnoughNonGiveaways()
+			AND
+			$this->hasEnoughTotal()
+			AND
+			$this->siteHasGiveaways()
+		);
 	}
 
 	/**
@@ -217,6 +225,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	/**
 	 * Returns an array of non giveaway product ids and their amount in the cart
 	 *
+	 * @param bool $bIsGiveaway
 	 * @return array
 	 */
 	private function getCartProductsAmounts($bIsGiveaway = false) {
@@ -238,5 +247,26 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		}
 
 		return $aProductsInCart;
+	}
+
+	/**
+	 * Check to see if there are giveaway products available on the site
+	 *
+	 * @return bool
+	 */
+	public function siteHasGiveaways() {
+		/* @var $oProduct Mage_Catalog_Model_Product */
+		$oProduct = Mage::getModel('catalog/product');
+		/* @var $oCollection Mage_Catalog_Model_Resource_Product_Collection */
+		$oCollection = $oProduct->getResourceCollection()
+			->addStoreFilter()
+			->addAttributeToFilter($this->getGiveawayIdentifierName(), true);
+
+		Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($oCollection);
+		Mage::getSingleton('catalog/product_status')->addSaleableFilterToCollection($oCollection);
+
+		if($oCollection->getSize() > 0) {
+			return true;
+		}
 	}
 }

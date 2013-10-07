@@ -52,10 +52,8 @@ class Sitewards_Giveaway_Block_Product_List_Giveaway extends Mage_Catalog_Block_
 			$oHeadBlock->setTitle($sTitle);
 		}
 
-		// add page title
 		$oTitleBlock = $this->getLayout()->createBlock('sitewards_giveaway/product_listTitle')
-			->setTemplate('sitewards/giveaway/catalog/product/list_title.phtml')
-			->setPageTitle($sTitle);
+			->setTemplate('sitewards/giveaway/catalog/product/list_title.phtml');
 		$this->getLayout()->getBlock('content')->insert($oTitleBlock);
 
 		return parent::_prepareLayout();
@@ -92,8 +90,9 @@ class Sitewards_Giveaway_Block_Product_List_Giveaway extends Mage_Catalog_Block_
 
 	/**
 	 * Set the Giveaway Product Collection
-	 * 
+	 *
 	 * @param Mage_Eav_Model_Entity_Collection_Abstract $oCollection
+	 * @return Sitewards_Giveaway_Block_Product_List_Giveaway
 	 */
 	public function setCollection($oCollection) {
 		$this->_productCollection = $oCollection;
