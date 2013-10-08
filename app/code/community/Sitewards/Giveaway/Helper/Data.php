@@ -163,9 +163,16 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		if (array_sum($aGiveawayProductsInCart) < $this->getGiveawaysPerCart()) {
 			return true;
 		} else {
-			Mage::getSingleton('checkout/session')->addNotice($this->__('Cannot add the item to shopping cart. You have already reached your limit of giveaway products.'));
+			$this->setMaximumGiveawayAmountReachedMessage();
 			return false;
 		}
+	}
+
+	/**
+	 * Sets an error message if the max amount of giveaways is reached
+	 */
+	public function setMaximumGiveawayAmountReachedMessage(){
+		Mage::getSingleton('checkout/session')->addNotice($this->__('Cannot add the item to shopping cart. You have already reached your limit of giveaway products.'));
 	}
 
 	/**
