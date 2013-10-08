@@ -24,14 +24,6 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 		$oHelper = Mage::helper('sitewards_giveaway');
 
 		$aParams = $this->getRequest()->getParams();
-		$aProductInformation[] = array(
-			'id'	=> $aParams['product'],
-			'qty'	=> (
-				(isset($aParams['qty']))
-					? (int)$aParams['qty']
-					: $oHelper->getDefaultOrderQtyForProductId($aParams['product'])
-			)
-		);
 
 		if (
 			$oHelper->isProductGiveaway(Mage::getModel('catalog/product')->load($aParams['product']))
