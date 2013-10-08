@@ -42,6 +42,8 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 	 * @return array keys - product-ids, values - new amount in the cart
 	 */
 	protected function getGiveawaysInCart(){
+		$aParams = $this->getRequest()->getParams();
+
 		/** @var Sitewards_Giveaway_Helper_Data $oHelper */
 		$oHelper = Mage::helper('sitewards_giveaway');
 
@@ -66,8 +68,6 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 	 * the amount of giveaway product over the allowed limit
 	 */
 	public function updatePostAction() {
-		$aParams    = $this->getRequest()->getParams();
-
 		/** @var Sitewards_Giveaway_Helper_Data $oHelper */
 		$oHelper = Mage::helper('sitewards_giveaway');
 
