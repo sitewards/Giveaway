@@ -11,6 +11,7 @@
 class Sitewards_Giveaway_Block_Product_ListTitle extends Mage_Core_Block_Template{
 
 	public function _toHtml(){
+		$this->setPageTitle(Mage::helper('sitewards_giveaway')->__('Free Allowances'));
 		return parent::_toHtml();
 	}
 }

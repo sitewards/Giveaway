@@ -40,7 +40,7 @@ class Sitewards_Giveaway_Block_Product_List_Giveaway extends Mage_Catalog_Block_
 					'label' => $this->__('Home'),
 					'title' => $this->__('Go to Home Page'),
 					'link'  => Mage::getBaseUrl()
-			))->addCrumb('search', array(
+			))->addCrumb('giveaway', array(
 					'label' => $sTitle,
 					'title' => $sTitle
 			));
