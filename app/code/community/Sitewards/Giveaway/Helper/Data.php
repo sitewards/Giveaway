@@ -114,7 +114,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	/**
 	 * Return the number of giveaway products in the cart
 	 *
-	 * @return array
+	 * @return integer
 	 */
 	public function getCartGiveawayProductsAmounts(){
 		return array_sum($this->getCartProductsAmounts(true));
@@ -123,7 +123,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	/**
 	 * Return the number of non giveaway products in the cart
 	 *
-	 * @return array
+	 * @return integer
 	 */
 	public function getCartNonGiveawayProductsAmounts(){
 		return array_sum($this->getCartProductsAmounts(false));
