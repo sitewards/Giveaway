@@ -24,7 +24,7 @@ class Sitewards_Giveaway_Model_Observer extends Mage_Core_Model_Observer {
 		if ($oHelper->isExtensionEnabled()
 			&& $oHelper->isForwardToGiveawaysPageEnabled()
 			&& $oHelper->canAddGiveawaysToCart() !== false
-			&& !$oHelper->isProductGiveaway($oObserver->getEvent()->getProduct()->getId())
+			&& !$oHelper->getGiveawayIdentifierValue($oObserver->getEvent()->getProduct()->getId())
 		) {
 			$oObserver->getRequest()->setParam('return_url', Mage::getUrl($oHelper->getGiveawaysPage()));
 		}

@@ -24,7 +24,7 @@ class Sitewards_Giveaway_CartController extends Mage_Checkout_CartController {
 
 		$aProductInformation = $oHelper->getAddCartProductInfo($this->getRequest());
 
-		if ($oHelper->isProductGiveaway($aProductInformation[0]['id'])
+		if ($oHelper->getGiveawayIdentifierValue($aProductInformation[0]['id'])
 			&& $oHelper->canAddProducts($aProductInformation, Sitewards_Giveaway_Helper_Data::S_CART_ACTION_ADD) == false
 		) {
 			$this->_goBack();
