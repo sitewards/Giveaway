@@ -13,16 +13,16 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	/**
 	 * Add cart action
 	 *
-	 * @type string
+	 * @type integer
 	 */
-	const S_CART_ACTION_ADD    = 'add';
+	const I_CART_ACTION_ADD    = 0;
 
 	/**
 	 * Update cart action
 	 *
-	 * @type string
+	 * @type integer
 	 */
-	const S_CART_ACTION_UPDATE = 'update';
+	const I_CART_ACTION_UPDATE = 1;
 
 	/**
 	 * Returns an attribute code to identify a give away product by
@@ -212,17 +212,14 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		$oCart				= $oCartHelper->getCart();
 		$oCartItems			= $oCart->getItems();
 		$bValidCart			= false;
-		$oProduct = Mage::getModel('catalog/product');
 
 		// loop through all products in the cart and set $bValidCart
 		// to true if we have at least one non-giveaway product
 		foreach ($oCartItems as $oItem) {
 			$iProductId = $oItem->getProductId();
-			$oProduct->load($iProductId);
-			if ( $oProduct->getData($this->getGiveawayIdentifierName()) != true ) {
+			if ( $this->getGiveawayIdentifierValue($iProductId) != true ) {
 				$bValidCart = true;
 			}
-			$oProduct->clearInstance();
 		}
 
 		$bHasDeprecatedGiveawayAmount = $this->getCartGiveawayProductsAmounts() > $this->getGiveawaysPerCart();
@@ -250,8 +247,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		$aProductsInCart = array();
 		foreach ($oCart->getItems() as $oItem) {
 			$iProductId = $oItem->getProductId();
-			$oProduct = Mage::getModel('catalog/product')->load($iProductId);
-			if ($oProduct->getData($this->getGiveawayIdentifierName()) == $bIsGiveaway) {
+			if ($this->getGiveawayIdentifierValue($iProductId) == $bIsGiveaway) {
 				$aProductsInCart[$iProductId] = $oItem->getQty();
 			}
 		}
@@ -289,8 +285,8 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 * @param string $sCartAction - cart action
 	 * @return boolean
 	 */
-	public function canAddProducts($aProductInformation, $sCartAction = self::S_CART_ACTION_UPDATE) {
-		if ($sCartAction == self::S_CART_ACTION_ADD
+	public function canAddProducts($aProductInformation, $sCartAction = self::I_CART_ACTION_UPDATE) {
+		if ($sCartAction == self::I_CART_ACTION_ADD
 			&& $this->getGiveawayIdentifierValue($aProductInformation[0]['id']) == false
 		) {
 			return true;
@@ -312,7 +308,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		$iTotalGiveawayQty    = 0;
 		$iTotalNonGiveawayQty = 0;
 		$iBaseGrandTotal      = 0;
-		if ($sCartAction == self::S_CART_ACTION_ADD) {
+		if ($sCartAction == self::I_CART_ACTION_ADD) {
 			$iTotalGiveawayQty    = $this->getCartGiveawayProductsAmounts();
 			$iTotalNonGiveawayQty = $this->getCartNonGiveawayProductsAmounts();
 			$iBaseGrandTotal      = (float)$oCheckoutSession->getQuote()->getBaseGrandTotal();
@@ -336,7 +332,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 		if ($bUpdateIsGiveaway == true) {
 			$sMessage = $this->__('Cannot add item(s) to your shopping cart.');
 			if($iTotalGiveawayQty > $iGiveawayMaxCount) {
-				$sMessage .= ' ' . $this->__('You can have only %s giveaway product(s) per cart.', $iGiveawayMaxCount);
+				$sMessage .= ' ' . $this->__('You can have only %s giveaway item(s) per cart.', $iGiveawayMaxCount);
 				$oCheckoutSession->addNotice($sMessage);
 				return false;
 			} elseif ($iTotalNonGiveawayQty < $iNonGiveawayMinCount) {
@@ -347,7 +343,8 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 				$oCheckoutSession->addNotice($sMessage);
 				return false;
 			} elseif ($iBaseGrandTotal < $iMinTotal) {
-				$sMessage .= ' ' . $this->__('The total of the cart must be at least %s.', $iMinTotal);
+				$fFormattedMinTotal = Mage::helper('core')->currency($iMinTotal);
+				$sMessage .= ' ' . $this->__('The total of the cart must be at least %s.', $fFormattedMinTotal);
 				$oCheckoutSession->addNotice($sMessage);
 				return false;
 			}
@@ -383,11 +380,14 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract {
 	 */
 	public function getAddCartProductInfo(Mage_Core_Controller_Request_Http $oRequest) {
 		$aParams = $oRequest->getParams();
+		if (isset($aParams['qty'])) {
+			$iQty = (int)$aParams['qty'];
+		} else {
+			$iQty = $this->getDefaultOrderQtyForProductId($aParams['product']);
+		}
 		$aProductInformation[] = array(
 			'id'  => $aParams['product'],
-			'qty' => (isset($aParams['qty'])
-				? (int)$aParams['qty']
-				: $this->getDefaultOrderQtyForProductId($aParams['product']))
+			'qty' => $iQty
 		);
 		return $aProductInformation;
 	}
