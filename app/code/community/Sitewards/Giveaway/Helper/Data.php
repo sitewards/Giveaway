@@ -123,7 +123,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Return the number of giveaway products in the cart
      *
-     * @return integer
+     * @return float
      */
     public function getCartGiveawayProductsAmounts()
     {
@@ -133,7 +133,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Return the number of non giveaway products in the cart
      *
-     * @return integer
+     * @return float
      */
     public function getCartNonGiveawayProductsAmounts()
     {
@@ -173,10 +173,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private function hasEnoughNonGiveaways()
     {
-        if ($this->getCartNonGiveawayProductsAmounts() < $this->getNonGiveawaysPerCart()) {
-            return false;
-        }
-        return true;
+        return $this->getCartNonGiveawayProductsAmounts() >= $this->getNonGiveawaysPerCart();
     }
 
     /**
@@ -186,10 +183,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private function canHaveMoreGiveaways()
     {
-        if ($this->getCartGiveawayProductsAmounts() >= $this->getGiveawaysPerCart()) {
-            return false;
-        }
-        return true;
+        return $this->getCartGiveawayProductsAmounts() < $this->getGiveawaysPerCart();
     }
 
     /**
@@ -239,8 +233,9 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        $bHasDeprecatedGiveawayAmount = $this->getCartGiveawayProductsAmounts() > $this->getGiveawaysPerCart();
-        $bHasEnoughNonGiveaways       = $this->getCartGiveawayProductsAmounts() > 0 && !$this->hasEnoughNonGiveaways();
+        $bHasDeprecatedGiveawayAmount = ($this->getCartGiveawayProductsAmounts() > $this->getGiveawaysPerCart());
+        $bHasSomeGiveaway             = ($this->getCartGiveawayProductsAmounts() > 0);
+        $bHasEnoughNonGiveaways       = ($bHasSomeGiveaway && !$this->hasEnoughNonGiveaways());
         if ($bHasDeprecatedGiveawayAmount || $bHasEnoughNonGiveaways || !$this->hasEnoughTotal()) {
             $bValidCart = false;
         }
@@ -292,6 +287,7 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
         if ($oCollection->getSize() > 0) {
             return true;
         }
+        return false;
     }
 
     /**
@@ -300,14 +296,16 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
      * Calculate cart params
      * Compare cart params with config limits and add notices
      *
-     * @param array $aProductInformation - an array with each element containing product id and quantity
+     * @param Sitewards_Giveaway_Model_Product_Quantity_Collection $oProductQuantityCollection
      * @param int $iCartAction - cart action
      * @return boolean
      */
-    public function canAddProducts($aProductInformation, $iCartAction = self::I_CART_ACTION_UPDATE)
-    {
+    public function canAddProducts(
+        Sitewards_Giveaway_Model_Product_Quantity_Collection $oProductQuantityCollection,
+        $iCartAction = self::I_CART_ACTION_UPDATE
+    ) {
         if ($iCartAction == self::I_CART_ACTION_ADD
-            && $this->getGiveawayIdentifierValue($aProductInformation[0]['id']) == false
+            && $this->getGiveawayIdentifierValue($oProductQuantityCollection->getFirstItem()->getId()) == false
         ) {
             return true;
         }
@@ -320,30 +318,30 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
          */
         $iGiveawayMaxCount    = (int)$this->getGiveawaysPerCart();
         $iNonGiveawayMinCount = (int)$this->getNonGiveawaysPerCart();
-        $iMinTotal            = (float)$this->getMinTotal();
+        $fMinTotal            = (float)$this->getMinTotal();
 
         /*
          * Calculate cart params according to the cart action
          */
-        $iTotalGiveawayQty    = 0;
-        $iTotalNonGiveawayQty = 0;
-        $iBaseGrandTotal      = 0;
+        $fTotalGiveawayQty    = 0;
+        $fTotalNonGiveawayQty = 0;
+        $fBaseGrandTotal      = 0;
         if ($iCartAction == self::I_CART_ACTION_ADD) {
-            $iTotalGiveawayQty    = $this->getCartGiveawayProductsAmounts();
-            $iTotalNonGiveawayQty = $this->getCartNonGiveawayProductsAmounts();
-            $iBaseGrandTotal      = (float)$oCheckoutSession->getQuote()->getBaseGrandTotal();
+            $fTotalGiveawayQty    = $this->getCartGiveawayProductsAmounts();
+            $fTotalNonGiveawayQty = $this->getCartNonGiveawayProductsAmounts();
+            $fBaseGrandTotal      = (float)$oCheckoutSession->getQuote()->getBaseGrandTotal();
         }
         $bUpdateIsGiveaway = false;
-        foreach ($aProductInformation as $aProduct) {
+        foreach ($oProductQuantityCollection as $oProductQuantity) {
             $oProduct = Mage::getModel('catalog/product');
-            $oProduct->load($aProduct['id']);
+            $oProduct->load($oProductQuantity->getId());
             if ($oProduct->getData($sGiveawayAttributeCode) == true) {
                 $bUpdateIsGiveaway  = true;
-                $iTotalGiveawayQty += $aProduct['qty'];
+                $fTotalGiveawayQty += $oProductQuantity->getQty();
             } else {
-                $iTotalNonGiveawayQty += $aProduct['qty'];
+                $fTotalNonGiveawayQty += $oProductQuantity->getQty();
             }
-            $iBaseGrandTotal += $aProduct['qty'] * $oProduct->getPrice();
+            $fBaseGrandTotal += $oProductQuantity->getQty() * $oProduct->getPrice();
         }
 
         /*
@@ -351,19 +349,19 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
          */
         if ($bUpdateIsGiveaway == true) {
             $sMessage = $this->__('Cannot add item(s) to your shopping cart.');
-            if ($iTotalGiveawayQty > $iGiveawayMaxCount) {
+            if ($fTotalGiveawayQty > $iGiveawayMaxCount) {
                 $sMessage .= ' ' . $this->__('You can have only %s giveaway item(s) per cart.', $iGiveawayMaxCount);
                 $oCheckoutSession->addNotice($sMessage);
                 return false;
-            } elseif ($iTotalNonGiveawayQty < $iNonGiveawayMinCount) {
+            } elseif ($fTotalNonGiveawayQty < $iNonGiveawayMinCount) {
                 $sMessage .= ' ' . $this->__(
                     'The total number of items in your cart must be at least %s.',
                     $iNonGiveawayMinCount
                 );
                 $oCheckoutSession->addNotice($sMessage);
                 return false;
-            } elseif ($iBaseGrandTotal < $iMinTotal) {
-                $fFormattedMinTotal = Mage::helper('core')->currency($iMinTotal);
+            } elseif ($fBaseGrandTotal < $fMinTotal) {
+                $fFormattedMinTotal = Mage::helper('core')->currency($fMinTotal);
                 $sMessage .= ' ' . $this->__('The total of the cart must be at least %s.', $fFormattedMinTotal);
                 $oCheckoutSession->addNotice($sMessage);
                 return false;
@@ -376,28 +374,28 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
      * Return update cart product data
      *
      * @param Mage_Core_Controller_Request_Http $oRequest
-     * @return array
+     * @return Sitewards_Giveaway_Model_Product_Quantity_Collection
      */
     public function getUpdateCartProductInfo(Mage_Core_Controller_Request_Http $oRequest)
     {
         $aParams = $oRequest->getParams();
-        $aProductInformation = array();
+        $oProductQuantityCollection = Mage::getModel('sitewards_giveaway/product_quantity_collection');
         foreach (Mage::getSingleton('checkout/cart')->getItems() as $iItemIndex => $oItem) {
             if (isset($aParams['cart'][$iItemIndex])) {
-                $aProductInformation[] = array(
-                    'id'  => $oItem->getProductId(),
-                    'qty' => $aParams['cart'][$iItemIndex]['qty']
-                );
+                $oProductQuantity = Mage::getModel('sitewards_giveaway/product_quantity');
+                $oProductQuantity->setId($oItem->getProductId());
+                $oProductQuantity->setQty($aParams['cart'][$iItemIndex]['qty']);
+                $oProductQuantityCollection->addItem($oProductQuantity);
             }
         }
-        return $aProductInformation;
+        return $oProductQuantityCollection;
     }
 
     /**
      * Return add cart product data
      *
      * @param Mage_Core_Controller_Request_Http $oRequest
-     * @return array
+     * @return Sitewards_Giveaway_Model_Product_Quantity_Collection
      */
     public function getAddCartProductInfo(Mage_Core_Controller_Request_Http $oRequest)
     {
@@ -407,10 +405,11 @@ class Sitewards_Giveaway_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $iQty = $this->getDefaultOrderQtyForProductId($aParams['product']);
         }
-        $aProductInformation[] = array(
-            'id'  => $aParams['product'],
-            'qty' => $iQty
-        );
-        return $aProductInformation;
+        $oProductQuantityCollection = Mage::getModel('sitewards_giveaway/product_quantity_collection');
+        $oProductQuantity = Mage::getModel('sitewards_giveaway/product_quantity');
+        $oProductQuantity->setId($aParams['product']);
+        $oProductQuantity->setQty($iQty);
+        $oProductQuantityCollection->addItem($oProductQuantity);
+        return $oProductQuantityCollection;
     }
 }
