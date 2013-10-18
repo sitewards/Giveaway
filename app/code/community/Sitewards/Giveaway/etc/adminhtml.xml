@@ -9,24 +9,24 @@
  */
 -->
 <config>
-	<acl>
-		<resources>
-			<admin>
-				<children>
-					<system>
-						<children>
-							<config>
-								<children>
-									<sitewards_giveaway_config>
-										<title>Sitewards Giveaway - Configuration</title>
-										<sort_order>1000</sort_order>
-									</sitewards_giveaway_config>
-								</children>
-							</config>
-						</children>
-					</system>
-				</children>
-			</admin>
-		</resources>
-	</acl>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <sitewards_giveaway_config>
+                                        <title>Sitewards Giveaway - Configuration</title>
+                                        <sort_order>1000</sort_order>
+                                    </sitewards_giveaway_config>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
 </config>

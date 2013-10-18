@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <config>
-	<modules>
-		<Sitewards_Giveaway>
-			<active>true</active>
-			<codePool>community</codePool>
-			<depends>
-				<Mage_Catalog />
-				<Mage_CatalogSearch />
-				<Mage_Eav />
-			</depends>
-		</Sitewards_Giveaway>
-	</modules>
+    <modules>
+        <Sitewards_Giveaway>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Catalog />
+                <Mage_CatalogSearch />
+                <Mage_Eav />
+            </depends>
+        </Sitewards_Giveaway>
+    </modules>
 </config>
